@@ -27,5 +27,6 @@ module.exports = [
   "util",
   "net",
   "vm",
-  "q"
+  "q",
+  "tls"
 ]

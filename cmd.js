@@ -230,7 +230,7 @@ function fixPackageJSON (modules, file, overwrite) {
     }
 
     modules.forEach(function (p) {
-      if (depBrowser[p] === false) {
+      if (depBrowser[p] === false && browser[p] !== false) {
         console.log('removing browser exclude', file, p)
         delete depBrowser[p]
       }
