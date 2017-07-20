@@ -112,7 +112,7 @@ function installShims (modulesToShim, done) {
         }
 
         if (!install) {
-          console.log('not reinstalling ' + name)
+          log('not reinstalling ' + name)
           shimPkgNames.splice(shimPkgNames.indexOf(name), 1)
         }
 
@@ -129,11 +129,11 @@ function installShims (modulesToShim, done) {
     var installLine = 'npm install --save '
     shimPkgNames.forEach(function (name) {
       if (allShims[name].indexOf('/') === -1) {
-        console.log('installing from npm', name)
+        log('installing from npm', name)
         installLine += name + '@' + allShims[name]
       } else {
         // github url
-        console.log('installing from github', name)
+        log('installing from github', name)
         installLine += allShims[name].match(/([^\/]+\/[^\/]+)$/)[1]
       }
 
@@ -153,7 +153,7 @@ function installShims (modulesToShim, done) {
       finish()
     })
 
-    console.log('installing:', installLine)
+    log('installing:', installLine)
     function finish () {
       copyShim(done)
     }
@@ -202,7 +202,7 @@ function fixPackageJSON (modules, file, overwrite) {
     }
 
     // if (shims[pkgJson.name]) {
-    //   console.log('skipping', pkgJson.name)
+    //   log('skipping', pkgJson.name)
     //   return
     // }
 
@@ -222,7 +222,7 @@ function fixPackageJSON (modules, file, overwrite) {
         depBrowser[p] = browser[p]
       } else {
         if (!overwrite && orgBrowser[p] !== browser[p]) {
-          console.log('not overwriting mapping', p, orgBrowser[p])
+          log('not overwriting mapping', p, orgBrowser[p])
         } else {
           depBrowser[p] = browser[p]
         }
@@ -231,10 +231,21 @@ function fixPackageJSON (modules, file, overwrite) {
 
     modules.forEach(function (p) {
       if (depBrowser[p] === false && browser[p] !== false) {
-        console.log('removing browser exclude', file, p)
+        log('removing browser exclude', file, p)
         delete depBrowser[p]
       }
     })
+
+
+    const { main } = pkgJson
+    if (main) {
+      const alt = main.startsWith('./') ? main.slice(2) : './' + main
+      if (depBrowser[alt]) {
+        depBrowser[main] = depBrowser[alt]
+        log(`normalized "main" browser mapping in ${pkgJson.name}, fixed here: https://github.com/facebook/metro-bundler/pull/3`)
+        delete depBrowser[alt]
+      }
+    }
 
     if (!deepEqual(orgBrowser, depBrowser)) {
       pkgJson.browser = pkgJson['react-native'] = depBrowser
@@ -249,7 +260,7 @@ function rethrow (err) {
 }
 
 function runHelp () {
-  console.log(function () {
+  log(function () {
     /*
     Usage:
         rn-nodeify --install dns,stream,http,https
@@ -265,4 +276,8 @@ function runHelp () {
     */
   }.toString().split(/\n/).slice(2, -2).join('\n'))
   process.exit(0)
+}
+
+function log () {
+  console.log.apply(console, arguments)
 }
