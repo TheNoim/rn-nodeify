@@ -127,7 +127,7 @@ function installShims (modulesToShim, done) {
       return finish()
     }
 
-    var installLine = 'yarn add '
+    var installLine = 'yarn add --ignore-scripts '
     shimPkgNames.forEach(function (name) {
       if (allShims[name].indexOf('/') === -1) {
         console.log('installing from npm', name)
