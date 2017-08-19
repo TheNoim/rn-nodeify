@@ -19,6 +19,7 @@ module.exports = [
   "fs",
   "dgram",
   // "readable-stream",
+  "tls",
   "stream",
   "string_decoder",
   "timers",
